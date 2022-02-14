@@ -6,10 +6,9 @@ namespace DaPigGuy\PiggyCrates\utils;
 
 use pocketmine\utils\TextFormat;
 
-class Utils
-{
-    public static function translateColorTags(string $message): string
-    {
+class Utils{
+
+    public static function translateColorTags(string $message): string{
         $replacements = [
             "{BLACK}" => TextFormat::BLACK,
             "{DARK_BLUE}" => TextFormat::DARK_BLUE,
@@ -26,6 +25,7 @@ class Utils
             "{RED}" => TextFormat::RED,
             "{LIGHT_PURPLE}" => TextFormat::LIGHT_PURPLE,
             "{YELLOW}" => TextFormat::YELLOW,
+			"{MINECOIN_GOLD}" => TextFormat::MINECOIN_GOLD,
             "{WHITE}" => TextFormat::WHITE,
             "{OBFUSCATED}" => TextFormat::OBFUSCATED,
             "{BOLD}" => TextFormat::BOLD,
