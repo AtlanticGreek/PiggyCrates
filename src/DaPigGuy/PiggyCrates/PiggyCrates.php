@@ -17,31 +17,29 @@ use DaPigGuy\PiggyCrates\utils\Utils;
 use DaPigGuy\PiggyCustomEnchants\CustomEnchantManager;
 use DaPigGuy\PiggyCustomEnchants\PiggyCustomEnchants;
 use Exception;
+use JetBrains\PhpStorm\Pure;
 use muqsit\invmenu\InvMenuHandler;
 use pocketmine\block\tile\TileFactory;
-use pocketmine\item\enchantment\Enchantment;
 use pocketmine\item\enchantment\EnchantmentInstance;
+use pocketmine\item\enchantment\StringToEnchantmentParser;
 use pocketmine\item\ItemFactory;
 use pocketmine\nbt\JsonNbtParser;
 use pocketmine\player\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\utils\Config;
 
-class PiggyCrates extends PluginBase
-{
-    /** @var PiggyCrates */
-    private static $instance;
+class PiggyCrates extends PluginBase{
 
-    /** @var Config */
-    private $messages;
+    private static PiggyCrates $instance;
+
+    private Config $messages;
 
     /** @var Crate[] */
-    public $crates = [];
-    /** @var array */
-    public $crateCreation;
+    public array $crates = [];
 
-    public function onEnable(): void
-    {
+    public array $crateCreation;
+
+    public function onEnable(): void{
         foreach (
             [
                 "Commando" => BaseCommand::class,
@@ -70,7 +68,7 @@ class PiggyCrates extends PluginBase
 
         $crateConfig = new Config($this->getDataFolder() . "crates.yml");
         $types = ["item", "command"];
-        foreach ($crateConfig->get("crates") as $crateName => $crateData) {
+        foreach ($crateConfig->get("crates") as $crateName => $crateData){
             $this->crates[$crateName] = new Crate($this, $crateName, $crateData["floating-text"] ?? "", array_map(function (array $itemData) use ($crateName, $types): CrateItem {
                 $tags = null;
                 if (isset($itemData["nbt"])) {
@@ -84,11 +82,11 @@ class PiggyCrates extends PluginBase
                 if (isset($itemData["name"])) $item->setCustomName($itemData["name"]);
                 if (isset($itemData["lore"])) $item->setLore(explode("\n", $itemData["lore"]));
                 if (isset($itemData["enchantments"])) foreach ($itemData["enchantments"] as $enchantmentData) {
-                    if (!isset($enchantmentData["name"]) || !isset($enchantmentData["level"])) {
+                    if (!isset($enchantmentData["name"]) || !isset($enchantmentData["level"])){
                         $this->getLogger()->error("Invalid enchantment configuration used in crate " . $crateName);
                         continue;
                     }
-                    $enchantment = Enchantment::fromString($enchantmentData["name"]) ?? ((($plugin = $this->getServer()->getPluginManager()->getPlugin("PiggyCustomEnchants")) instanceof PiggyCustomEnchants && $plugin->isEnabled()) ? CustomEnchantManager::getEnchantmentByName($enchantmentData["name"]) : null);
+                    $enchantment = StringToEnchantmentParser::getInstance()->parse($enchantmentData["name"]) ?? ((($plugin = $this->getServer()->getPluginManager()->getPlugin("PiggyCustomEnchants")) instanceof PiggyCustomEnchants && $plugin->isEnabled()) ? CustomEnchantManager::getEnchantmentByName($enchantmentData["name"]) : null);
                     if ($enchantment !== null) $item->addEnchantment(new EnchantmentInstance($enchantment, $enchantmentData["level"]));
                 }
                 $itemData["type"] = $itemData["type"] ?? "item";
@@ -110,41 +108,36 @@ class PiggyCrates extends PluginBase
         $this->getServer()->getAsyncPool()->submitTask(new CheckUpdatesTask());
     }
 
-    public static function getInstance(): PiggyCrates
-    {
+    public static function getInstance(): PiggyCrates{
         return self::$instance;
     }
 
-    public function getMessage(string $key, array $tags = []): string
-    {
+    public function getMessage(string $key, array $tags = []): string{
         return Utils::translateColorTags(str_replace(array_keys($tags), $tags, $this->messages->getNested($key, $key)));
     }
 
-    public function getCrate(string $name): ?Crate
-    {
+    public function getCrate(string $name): ?Crate{
         return $this->crates[$name] ?? null;
     }
 
-    public function getCrates(): array
-    {
+    public function getCrates(): array{
         return $this->crates;
     }
 
-    public function inCrateCreationMode(Player $player): bool
-    {
+    #[Pure]
+	public function inCrateCreationMode(Player $player): bool{
         return isset($this->crateCreation[$player->getName()]);
     }
 
-    public function setInCrateCreationMode(Player $player, ?Crate $crate): void
-    {
-        if ($crate === null) {
+    public function setInCrateCreationMode(Player $player, ?Crate $crate): void{
+        if ($crate === null){
             unset($this->crateCreation[$player->getName()]);
         }
         $this->crateCreation[$player->getName()] = $crate;
     }
 
-    public function getCrateToCreate(Player $player): ?Crate
-    {
+    #[Pure]
+	public function getCrateToCreate(Player $player): ?Crate{
         return $this->crateCreation[$player->getName()] ?? null;
     }
 }

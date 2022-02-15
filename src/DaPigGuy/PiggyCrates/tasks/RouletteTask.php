@@ -9,39 +9,36 @@ use DaPigGuy\PiggyCrates\crates\Crate;
 use DaPigGuy\PiggyCrates\crates\CrateItem;
 use DaPigGuy\PiggyCrates\PiggyCrates;
 use muqsit\invmenu\InvMenu;
-use muqsit\invmenu\SharedInvMenu;
-use pocketmine\command\ConsoleCommandSender;
+use muqsit\invmenu\type\InvMenuTypeIds;
+use pocketmine\console\ConsoleCommandSender;
 use pocketmine\item\ItemFactory;
 use pocketmine\item\ItemIds;
 use pocketmine\player\Player;
 use pocketmine\scheduler\Task;
 use pocketmine\utils\TextFormat;
 
-class RouletteTask extends Task
-{
+class RouletteTask extends Task{
+
     const INVENTORY_ROW_COUNT = 9;
 
-    /** @var Player */
-    private $player;
-    /** @var Crate */
-    private $crate;
-    /** @var CrateTile */
-    private $tile;
-    /** @var SharedInvMenu */
-    private $menu;
+    private Player $player;
 
-    /** @var int */
-    private $currentTick = 0;
-    /** @var bool */
-    private $showReward = false;
-    /** @var int */
-    private $itemsLeft;
+    private Crate $crate;
+
+    private CrateTile $tile;
+
+    private InvMenu $menu;
+
+    private int $currentTick = 0;
+
+    private bool $showReward = false;
+
+    private int $itemsLeft;
 
     /** @var CrateItem[] */
-    private $lastRewards = [];
+    private array $lastRewards = [];
 
-    public function __construct(CrateTile $tile)
-    {
+    public function __construct(CrateTile $tile){
         /** @var Player $player */
         $player = $tile->getCurrentPlayer();
         $this->player = $player;
@@ -52,19 +49,18 @@ class RouletteTask extends Task
 
         $this->tile = $tile;
 
-        $this->menu = InvMenu::create(InvMenu::TYPE_CHEST);
+        $this->menu = InvMenu::create(InvMenuTypeIds::TYPE_CHEST);
         $this->menu->getInventory()->setContents([4 => ($endRod = ItemFactory::getInstance()->get(ItemIds::END_ROD)->setCustomName(TextFormat::ITALIC)), 22 => $endRod]);
         $this->menu->setInventoryCloseListener(function (Player $player): void {
             if ($this->itemsLeft > 0) $this->menu->send($player);
         });
-        $this->menu->readonly();
+        $this->menu->setListener(InvMenu::readonly());
         $this->menu->send($player);
 
         $this->itemsLeft = $crate->getDropCount();
     }
 
-    public function onRun(): void
-    {
+    public function onRun(): void{
         if (!$this->player->isOnline()) {
             $this->tile->closeCrate();
             if (($handler = $this->getHandler()) !== null) $handler->cancel();

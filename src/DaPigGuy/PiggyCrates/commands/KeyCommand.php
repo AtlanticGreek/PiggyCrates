@@ -12,16 +12,17 @@ use DaPigGuy\PiggyCrates\PiggyCrates;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
 
-class KeyCommand extends BaseCommand
-{
+class KeyCommand extends BaseCommand{
+
     /** @var PiggyCrates */
     protected $plugin;
 
-    /**
-     * @param array $args
-     */
-    public function onRun(CommandSender $sender, string $aliasUsed, array $args): void
-    {
+	/**
+	 * @param CommandSender $sender
+	 * @param string $aliasUsed
+	 * @param array $args
+	 */
+    public function onRun(CommandSender $sender, string $aliasUsed, array $args): void{
         if (!isset($args["type"])) {
             $sender->sendMessage("Usage: /key <type>");
             return;
@@ -30,7 +31,7 @@ class KeyCommand extends BaseCommand
             $sender->sendMessage("Usage: /key <type> <amount> <player>");
             return;
         }
-        $target = empty($args["player"]) ? $sender : $this->plugin->getServer()->getPlayer($args["player"]);
+        $target = empty($args["player"]) ? $sender : $this->plugin->getServer()->getPlayerByPrefix($args["player"]);
         if (!$target instanceof Player) {
             $sender->sendMessage($this->plugin->getMessage("commands.key.error.invalid-player"));
             return;
@@ -55,8 +56,7 @@ class KeyCommand extends BaseCommand
     /**
      * @throws ArgumentOrderException
      */
-    public function prepare(): void
-    {
+    public function prepare(): void{
         $this->setPermission("piggycrates.command.key");
         $this->registerArgument(0, new RawStringArgument("type"));
         $this->registerArgument(1, new IntegerArgument("amount", true));

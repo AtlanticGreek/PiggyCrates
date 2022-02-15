@@ -10,24 +10,21 @@ use pocketmine\block\tile\Chest;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerInteractEvent;
 
-class EventListener implements Listener
-{
-    /** @var PiggyCrates */
-    private $plugin;
+class EventListener implements Listener{
 
-    public function __construct(PiggyCrates $plugin)
-    {
+    private PiggyCrates $plugin;
+
+    public function __construct(PiggyCrates $plugin){
         $this->plugin = $plugin;
     }
 
-    public function onInteract(PlayerInteractEvent $event): void
-    {
+    public function onInteract(PlayerInteractEvent $event): void{
         $player = $event->getPlayer();
         $block = $event->getBlock();
-        $world = $block->getPos()->getWorld();
+        $world = $block->getPosition()->getWorld();
         $item = $player->getInventory()->getItemInHand();
         if ($block->getId() === BlockLegacyIds::CHEST) {
-            $tile = $world->getTile($block->getPos());
+            $tile = $world->getTile($block->getPosition());
             if ($tile instanceof CrateTile) {
                 if ($tile->getCrateType() === null) {
                     $player->sendTip($this->plugin->getMessage("crates.error.invalid-crate"));
@@ -36,22 +33,22 @@ class EventListener implements Listener
                 } elseif ($event->getAction() === PlayerInteractEvent::RIGHT_CLICK_BLOCK) {
                     $tile->previewCrate($player);
                 }
-                $event->setCancelled();
+                $event->cancel();
                 return;
             }
             if ($tile instanceof Chest) {
                 if (($crate = $this->plugin->getCrateToCreate($player)) !== null) {
-                    $newTile = new CrateTile($world, $block->getPos());
+                    $newTile = new CrateTile($world, $block->getPosition());
                     $newTile->setCrateType($crate);
                     $world->addTile($newTile);
                     $tile->close();
                     $player->sendMessage($this->plugin->getMessage("crates.success.crate-created", ["{CRATE}" => $crate->getName()]));
                     $this->plugin->setInCrateCreationMode($player, null);
-                    $event->setCancelled();
+                    $event->cancel();
                     return;
                 }
             }
         }
-        if ($item->getNamedTag()->getTag("KeyType") !== null) $event->setCancelled();
+        if ($item->getNamedTag()->getTag("KeyType") !== null) $event->cancel();
     }
 }
