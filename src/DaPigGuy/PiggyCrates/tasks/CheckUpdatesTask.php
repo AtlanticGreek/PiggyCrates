@@ -10,15 +10,13 @@ use pocketmine\plugin\ApiVersion;
 use pocketmine\scheduler\AsyncTask;
 use pocketmine\utils\Internet;
 
-class CheckUpdatesTask extends AsyncTask
-{
-    public function onRun(): void
-    {
+class CheckUpdatesTask extends AsyncTask{
+
+    public function onRun(): void{
         $this->setResult([Internet::getURL("https://poggit.pmmp.io/releases.json?name=PiggyCrates", 10, [], $error), $error]);
     }
 
-    public function onCompletion(): void
-    {
+    public function onCompletion(): void{
         $plugin = PiggyCrates::getInstance();
         try {
             if ($plugin->isEnabled()) {

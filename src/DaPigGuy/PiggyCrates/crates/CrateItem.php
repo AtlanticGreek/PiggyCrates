@@ -6,48 +6,43 @@ namespace DaPigGuy\PiggyCrates\crates;
 
 use pocketmine\item\Item;
 
-class CrateItem
-{
-    /** @var Item */
-    public $item;
-    /** @var string */
-    public $type;
+class CrateItem{
+
+    public Item $item;
+
+    public string $type;
+
     /** @var string[] */
-    public $commands;
-    /** @var int */
-    public $chance;
+    public array $commands;
+
+    public int $chance;
 
     /**
      * @param string[] $commands
      */
-    public function __construct(Item $item, string $type, array $commands, int $chance)
-    {
+    public function __construct(Item $item, string $type, array $commands, int $chance){
         $this->item = $item;
         $this->type = $type;
         $this->commands = $commands;
         $this->chance = $chance;
     }
 
-    public function getItem(): Item
-    {
+    public function getItem(): Item{
         return $this->item;
     }
 
-    public function getType(): string
-    {
+    public function getType(): string{
         return $this->type;
     }
 
     /**
      * @return string[]
      */
-    public function getCommands(): array
-    {
+    public function getCommands(): array{
         return $this->commands;
     }
 
-    public function getChance(): int
-    {
+    public function getChance(): int{
         return $this->chance;
     }
 }

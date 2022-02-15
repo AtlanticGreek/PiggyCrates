@@ -11,16 +11,17 @@ use DaPigGuy\PiggyCrates\PiggyCrates;
 use pocketmine\command\CommandSender;
 use pocketmine\player\Player;
 
-class CrateCommand extends BaseCommand
-{
+class CrateCommand extends BaseCommand{
+
     /** @var PiggyCrates */
     protected $plugin;
 
-    /**
-     * @param array $args
-     */
-    public function onRun(CommandSender $sender, string $aliasUsed, array $args): void
-    {
+	/**
+	 * @param CommandSender $sender
+	 * @param string $aliasUsed
+	 * @param array $args
+	 */
+    public function onRun(CommandSender $sender, string $aliasUsed, array $args): void{
         if (!$sender instanceof Player) {
             $sender->sendMessage($this->plugin->getMessage("commands.use-in-game"));
             return;
@@ -50,8 +51,7 @@ class CrateCommand extends BaseCommand
     /**
      * @throws ArgumentOrderException
      */
-    public function prepare(): void
-    {
+    public function prepare(): void{
         $this->setPermission("piggycrates.command.crate");
         $this->registerArgument(0, new RawStringArgument("type"));
     }

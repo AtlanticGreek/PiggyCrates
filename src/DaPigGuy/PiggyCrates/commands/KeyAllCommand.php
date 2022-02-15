@@ -11,16 +11,17 @@ use CortexPE\Commando\exception\ArgumentOrderException;
 use DaPigGuy\PiggyCrates\PiggyCrates;
 use pocketmine\command\CommandSender;
 
-class KeyAllCommand extends BaseCommand
-{
+class KeyAllCommand extends BaseCommand{
+
     /** @var PiggyCrates */
     protected $plugin;
 
-    /**
-     * @param array $args
-     */
-    public function onRun(CommandSender $sender, string $aliasUsed, array $args): void
-    {
+	/**
+	 * @param CommandSender $sender
+	 * @param string $aliasUsed
+	 * @param array $args
+	 */
+    public function onRun(CommandSender $sender, string $aliasUsed, array $args): void{
         if (!isset($args["type"])) {
             $sender->sendMessage("Usage: /keyall <type>");
             return;
@@ -47,8 +48,7 @@ class KeyAllCommand extends BaseCommand
     /**
      * @throws ArgumentOrderException
      */
-    public function prepare(): void
-    {
+    public function prepare(): void{
         $this->setPermission("piggycrates.command.keyall");
         $this->registerArgument(0, new RawStringArgument("type"));
         $this->registerArgument(1, new IntegerArgument("amount", true));

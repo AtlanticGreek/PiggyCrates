@@ -9,28 +9,27 @@ use pocketmine\item\Item;
 use pocketmine\item\ItemFactory;
 use pocketmine\player\Player;
 
-class Crate
-{
-    /** @var PiggyCrates */
-    private $plugin;
+class Crate{
 
-    /** @var string */
-    public $name;
-    /** @var string */
-    public $floatingText;
+    private PiggyCrates $plugin;
+
+    public string $name;
+
+    public string $floatingText;
+
     /** @var CrateItem[] */
-    public $drops;
-    /** @var int */
-    public $dropCount;
+    public array $drops;
+
+    public int $dropCount;
+
     /** @var string[] */
-    public $commands;
+    public array $commands;
 
     /**
      * @param CrateItem[] $drops
      * @param string[] $commands
      */
-    public function __construct(PiggyCrates $plugin, string $name, string $floatingText, array $drops, int $dropCount, array $commands)
-    {
+    public function __construct(PiggyCrates $plugin, string $name, string $floatingText, array $drops, int $dropCount, array $commands){
         $this->plugin = $plugin;
         $this->name = $name;
         $this->floatingText = $floatingText;
@@ -39,29 +38,25 @@ class Crate
         $this->commands = $commands;
     }
 
-    public function getName(): string
-    {
+    public function getName(): string{
         return $this->name;
     }
 
-    public function getFloatingText(): string
-    {
+    public function getFloatingText(): string{
         return $this->floatingText;
     }
 
     /**
      * @return CrateItem[]
      */
-    public function getDrops(): array
-    {
+    public function getDrops(): array{
         return $this->drops;
     }
 
     /**
      * @return CrateItem[]
      */
-    public function getDrop(int $amount): array
-    {
+    public function getDrop(int $amount): array{
         $dropTable = [];
         foreach ($this->drops as $drop) {
             for ($i = 0; $i < $drop->getChance(); $i++) {
@@ -76,21 +71,18 @@ class Crate
         }, $keys);
     }
 
-    public function getDropCount(): int
-    {
+    public function getDropCount(): int{
         return $this->dropCount;
     }
 
     /**
      * @return string[]
      */
-    public function getCommands(): array
-    {
+    public function getCommands(): array{
         return $this->commands;
     }
 
-    public function giveKey(Player $player, int $amount): void
-    {
+    public function giveKey(Player $player, int $amount): void{
         $key = ItemFactory::getInstance()->get((int)$this->plugin->getConfig()->getNested("keys.id"), (int)$this->plugin->getConfig()->getNested("keys.meta"), $amount);
         $key->setCustomName(ucfirst(str_replace("{CRATE}", $this->getName(), $this->plugin->getConfig()->getNested("keys.name"))));
         $key->setLore([str_replace("{CRATE}", $this->getName(), $this->plugin->getConfig()->getNested("keys.lore"))]);
@@ -98,8 +90,7 @@ class Crate
         $player->getInventory()->addItem($key);
     }
 
-    public function isValidKey(Item $item): bool
-    {
+    public function isValidKey(Item $item): bool{
         return $item->getId() === (int)$this->plugin->getConfig()->getNested("keys.id") &&
             $item->getMeta() === (int)$this->plugin->getConfig()->getNested("keys.meta") &&
             $item->getNamedTag()->getString("KeyType") === $this->getName();
